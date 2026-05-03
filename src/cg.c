@@ -908,7 +908,7 @@ void cgglobsym(int id)
 {
     int typesize;
 
-    if (Symtable[id].stype == S_FUNCTION)
+    if (Symtable[id].stype == S_FUNCTION || Symtable[id].stype == S_EXTERN)
     {
         return;
     }

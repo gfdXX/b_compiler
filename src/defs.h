@@ -110,7 +110,7 @@ enum {
 // Structural types
 enum
 {
-  S_VARIABLE, S_FUNCTION, S_ARRAY, S_LABEL
+  S_VARIABLE, S_FUNCTION, S_ARRAY, S_LABEL, S_EXTERN
 };
 
 // Storage classes

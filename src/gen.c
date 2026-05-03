@@ -111,20 +111,13 @@ static int genSWITCH(struct ASTnode *n)
     {
         // Get a label for this case. Store it
         // and the case value in the arrays.
-        // Record if it is the default case.
+        // Store the case value and label.
         int thislabel = genlabel();
         cglabel(thislabel);
 
-        if (c->op == A_DEFAULT)
-        {
-            defaultlabel = thislabel;
-        }
-        else
-        {
-            caselabel[casecount] = thislabel;
-            caseval[casecount] = c->intvalue;
-            casecount++;
-        }
+        caselabel[casecount] = thislabel;
+        caseval[casecount] = c->intvalue;
+        casecount++;
 
         // Generate the case code. Pass in the end label for the breaks
         genAST(c->left, NOLABEL, NOLABEL, Lend, 0);

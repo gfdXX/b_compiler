@@ -87,6 +87,14 @@ void var_declaration(int type, int class)
             {
                 id = addglob(Text, pointer_to(type), S_ARRAY, class,
                              Token.intvalue);
+                if (class == C_GLOBAL && Symtable[id].stype == S_EXTERN)
+                {
+                    Symtable[id].type = pointer_to(type);
+                    Symtable[id].stype = S_ARRAY;
+                    Symtable[id].class = class;
+                    Symtable[id].size = Token.intvalue;
+                    Symtable[id].posn = 0;
+                }
                 genglobsym(id);
             }
         }
@@ -108,6 +116,14 @@ void var_declaration(int type, int class)
         else
         {
             id = addglob(Text, type, S_VARIABLE, class, 1);
+            if (class == C_GLOBAL && Symtable[id].stype == S_EXTERN)
+            {
+                Symtable[id].type = type;
+                Symtable[id].stype = S_VARIABLE;
+                Symtable[id].class = class;
+                Symtable[id].size = 1;
+                Symtable[id].posn = 0;
+            }
             if (class == C_GLOBAL)
             {
                 genglobsym(id);
@@ -152,7 +168,7 @@ static int param_declaration(int id)
         // Check that this type matches the prototype.
         if (param_id)
         {
-            if (type != Symtable[id].type)
+            if (type != Symtable[param_id].type)
             {
                 fatald("Type doesn't match prototype for parameter", paramcnt + 1);
             }
@@ -297,6 +313,13 @@ static void b_var_declaration(int class, int name_already_read)
 
         id = addglob(Text, isvector ? pointer_to(P_LONG) : P_LONG,
                      isvector ? S_ARRAY : S_VARIABLE, class, size);
+        if (Symtable[id].stype == S_EXTERN)
+        {
+            Symtable[id].type = isvector ? pointer_to(P_LONG) : P_LONG;
+            Symtable[id].stype = isvector ? S_ARRAY : S_VARIABLE;
+            Symtable[id].class = class;
+            Symtable[id].posn = 0;
+        }
         Symtable[id].size = size;
 
         if (initcount)
@@ -335,7 +358,7 @@ void b_extrn_declaration(void)
     while (1)
     {
         ident();
-        addglob(Text, P_LONG, S_FUNCTION, C_GLOBAL, 0);
+        addglob(Text, P_LONG, S_EXTERN, C_GLOBAL, 0);
 
         if (Token.token == T_SEMI)
         {
@@ -350,16 +373,32 @@ void b_extrn_declaration(void)
 struct ASTnode *function_declaration(int type)
 {
     struct ASTnode *tree;
-    int id;
+    int id, proto_id;
     int nameslot, endlabel, paramcnt;
 
-    // Text has the identifier's name. If this exists and is a
-    // function, get the id. Otherwise, set id to -1
+    // Text has the identifier's name. An extrn name is generic in B,
+    // so a later definition can refine it into a function.
+    nameslot = -1;
     if ((id = findsymbol(Text)) != -1)
     {
-        if (Symtable[id].stype != S_FUNCTION)
+        if (Symtable[id].stype == S_FUNCTION)
         {
+            nameslot = id;
+        }
+        else if (Symtable[id].stype == S_EXTERN)
+        {
+            endlabel = genlabel();
+            Symtable[id].type = type;
+            Symtable[id].stype = S_FUNCTION;
+            Symtable[id].class = C_GLOBAL;
+            Symtable[id].endlabel = endlabel;
+            Symtable[id].nelems = 0;
+            nameslot = id;
             id = -1;
+        }
+        else
+        {
+            fatals("Symbol is not a function", Text);
         }
     }
 
@@ -368,18 +407,23 @@ struct ASTnode *function_declaration(int type)
     // to the symbol table,
     if (id == -1)
     {
-        endlabel = genlabel();
-        nameslot = addglob(Text, type, S_FUNCTION, C_GLOBAL, endlabel);
+        if (nameslot == -1)
+        {
+            endlabel = genlabel();
+            nameslot = addglob(Text, type, S_FUNCTION, C_GLOBAL, endlabel);
+        }
     }
+
+    proto_id = id;
     // Scan in the '(', any parameters and the ')'.
     // Pass in any existing function prototype symbol slot number
     lparen();
-    paramcnt = param_declaration(id);
+    paramcnt = param_declaration(proto_id);
     rparen();
 
     // If this is a new function declaration, update the
     // function symbol entry with the number of parameters
-    if (id == -1)
+    if (proto_id == -1)
     {
         Symtable[nameslot].nelems = paramcnt;
     }

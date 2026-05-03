@@ -150,7 +150,6 @@ static struct ASTnode *switch_statement(void)
 {
     struct ASTnode *left, *n, *c, *casetree= NULL, *casetail;
     int inloop = 1, casecount = 0;
-    int seendefault = 0;
     int ASTop, casevalue;
 
     match(T_SWITCH, "switch");
@@ -167,12 +166,6 @@ static struct ASTnode *switch_statement(void)
     }
 
     lbrace();
-
-    // Ensure that this is of int type
-    if (!inttype(left->type))
-    {
-        fatal("Switch expression is not of integer type");
-    }
 
     // Build an A_SWITCH subtree with the expression as
     // the child
@@ -193,20 +186,7 @@ static struct ASTnode *switch_statement(void)
                 inloop=0;
                 break;
             case T_CASE:
-            case T_DEFAULT:
-                // Set the AST operation. Scan the case value if required
-                if (Token.token==T_DEFAULT)
-                {
-                    if (seendefault)
-                    {
-                        fatal("Duplicate default");
-                    }
-                    ASTop= A_DEFAULT;
-                    seendefault= 1;
-                    scan(&Token);
-                }
-                else 
-                {
+                // Set the AST operation and scan the case value.
                 ASTop= A_CASE;
                 scan(&Token);
                 left= binexpr(0);
@@ -225,7 +205,6 @@ static struct ASTnode *switch_statement(void)
                     {
                         fatal("Duplicate case value");
                     }
-                }
                 }
 
                 // Scan the ':' and get the compound expression
@@ -251,7 +230,7 @@ static struct ASTnode *switch_statement(void)
     }
     Switchlevel--;
 
-    // We have a sub-tree with the cases and any default. Put the
+    // We have a sub-tree with the cases. Put the
     // case count into the A_SWITCH node and attach the case tree.
     n->intvalue= casecount;
     n->right= casetree;
@@ -357,7 +336,7 @@ struct ASTnode *compound_statement(int inswitch)
             return (left);
         }
 
-        if (inswitch && (Token.token == T_CASE || Token.token == T_DEFAULT))
+        if (inswitch && Token.token == T_CASE)
         {
             return(left);
         }

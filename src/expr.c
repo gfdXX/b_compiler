@@ -43,7 +43,8 @@ static struct ASTnode *function_call(struct ASTnode *callee)
     args = expression_list(T_RPAREN);
     rparen();
 
-    if (callee->op == A_ADDR && Symtable[callee->id].stype == S_FUNCTION)
+    if ((callee->op == A_ADDR && Symtable[callee->id].stype == S_FUNCTION) ||
+        (callee->op == A_IDENT && Symtable[callee->id].stype == S_EXTERN))
     {
         id = callee->id;
         tree = mkastunary(A_FUNCCALL, Symtable[id].type, args, id);
@@ -65,6 +66,12 @@ static struct ASTnode *index_access(struct ASTnode *base)
     scan(&Token);
     index = binexpr(0);
     match(T_RBRACKET, "]");
+
+    if (base->op == A_IDENT && Symtable[base->id].stype == S_EXTERN)
+    {
+        base->op = A_ADDR;
+        base->type = pointer_to(P_LONG);
+    }
 
     if (inttype(base->type) && ptrtype(index->type))
     {
@@ -109,6 +116,7 @@ static struct ASTnode *identifier_node(void)
     switch (Symtable[id].stype)
     {
         case S_VARIABLE:
+        case S_EXTERN:
             return (mkastleaf(A_IDENT, Symtable[id].type, id));
         case S_ARRAY:
         case S_FUNCTION:

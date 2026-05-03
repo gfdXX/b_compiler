@@ -303,12 +303,6 @@ static int keyword(char *s)
                 return (T_CHAR);
             }
             break;
-        case 'd':
-            if (!strcmp(s, "default"))
-            {
-                return (T_DEFAULT);
-            }
-            break;
         case 'e':
             if (!strcmp(s, "else"))
             {

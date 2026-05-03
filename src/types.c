@@ -39,11 +39,9 @@ int value_at(int type)
     return (type - 1);
 }
 
-// Given an AST tree and a type which we want it to become,
-// possibly modify the tree by widening or scaling so that
-// it is compatible with this type. Return the original tree
-// if no changes occurred, a modified tree, or NULL if the
-// tree is not compatible with the given type.
+// Given an AST tree and contextual type information, add only the
+// widening/scaling nodes needed by this backend. B expressions are
+// otherwise typeless machine words.
 // If this will be part of a binary operation, the AST op is not zero.
 struct ASTnode *modify_type(struct ASTnode *tree, int rtype, int op)
 {
@@ -52,49 +50,8 @@ struct ASTnode *modify_type(struct ASTnode *tree, int rtype, int op)
 
     ltype = tree->type;
 
-    // Compare scalar int types
-    if (inttype(ltype) && inttype(rtype))
-    {
-
-        // Both types same, nothing to do
-        if (ltype == rtype)
-        {
-            return (tree);
-        }
-
-        // Get the sizes for each type
-        lsize = genprimsize(ltype);
-        rsize = genprimsize(rtype);
-
-        // Tree's size is too big
-        if (lsize > rsize)
-        {
-            return (NULL);
-        }
-
-        // Widen to the right
-        if (rsize > lsize)
-        {
-            return (mkastunary(A_WIDEN, rtype, tree, 0));
-        }
-    }
-    // For pointers on the left
-    if (ptrtype(ltype))
-    {
-        // OK is same type on right and not doing a binary op
-        if (op == 0 && ltype == rtype)
-        {
-            return (tree);
-        }
-        if (op == 0 && inttype(rtype))
-        {
-            return (tree);
-        }
-    }
-    if (inttype(ltype) && ptrtype(rtype) && op == 0)
-    {
-        return (tree);
-    }
+    // B is typeless: every expression is a machine word. Keep only the
+    // address scaling needed by this byte-addressed backend.
     // We can scale only on A_ADD or A_SUBTRACT operation
     if (op == A_ADD || op == A_SUBTRACT)
     {
@@ -113,6 +70,17 @@ struct ASTnode *modify_type(struct ASTnode *tree, int rtype, int op)
             }
         }
     }
-    // If we get here, the types are not compatible
-    return (NULL);
+
+    if (op == 0 && inttype(ltype) && inttype(rtype) && ltype != rtype)
+    {
+        lsize = genprimsize(ltype);
+        rsize = genprimsize(rtype);
+
+        if (rsize > lsize)
+        {
+            return (mkastunary(A_WIDEN, rtype, tree, 0));
+        }
+    }
+
+    return (tree);
 }

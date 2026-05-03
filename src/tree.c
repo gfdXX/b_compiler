@@ -187,7 +187,14 @@ void dumpAST(struct ASTnode *n, int label, int level)
             fprintf(stdout, "A_RETURN\n");
             return;
         case A_FUNCCALL:
-            fprintf(stdout, "A_FUNCCALL %s\n", Symtable[n->id].name);
+            if (n->id >= 0)
+            {
+                fprintf(stdout, "A_FUNCCALL %s\n", Symtable[n->id].name);
+            }
+            else
+            {
+                fprintf(stdout, "A_FUNCCALL indirect\n");
+            }
             return;
         case A_ADDR:
             fprintf(stdout, "A_ADDR %s\n", Symtable[n->id].name);

@@ -20,8 +20,6 @@ skip:
         printf("%d\n", 1);
     case 3:
         printf("%d\n", 3);
-    default:
-        printf("%d\n", 9);
     }
 
     return 0;
