@@ -2,7 +2,7 @@ main() {
     auto x, y;
     extrn printf;
 
-    x = 3;
+    x = 1;
     y = x > 2 ? 11 : 22;
     printf("%d\n", y);
 

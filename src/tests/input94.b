@@ -2,7 +2,7 @@ main() {
     auto x;
     extrn printf;
 
-    x = 1;
+    x = 2;
 
     switch x {
     case 1:

@@ -108,7 +108,10 @@ void var_declaration(int type, int class)
         else
         {
             id = addglob(Text, type, S_VARIABLE, class, 1);
-            genglobsym(id);
+            if (class == C_GLOBAL)
+            {
+                genglobsym(id);
+            }
         }
     }
 }

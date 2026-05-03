@@ -1196,32 +1196,13 @@ int cgstorderef(int r1, int r2, int type)
 void cgswitch(int reg, int casecount, int toplabel,
 	      int *caselabel, int *caseval, int defaultlabel)
 {
-    int i, label;
+    int i;
 
-    // Get a label for the switch table
-    label = genlabel();
-    cglabel(label);
-
-    // Heuristic. If we have no cases, create one case
-    // which points to the default case
-    if (casecount == 0)
-    {
-        caseval[0] = 0;
-        caselabel[0] = defaultlabel;
-        casecount = 1;
-    }
-    // Generate the switch jump table.
-    fprintf(Outfile, "\t.quad\t%d\n", casecount);
+    cglabel(toplabel);
     for (i = 0; i < casecount; i++)
     {
-        fprintf(Outfile, "\t.quad\t%d, L%d\n", caseval[i], caselabel[i]);
+        fprintf(Outfile, "\tcmpq\t$%d, %s\n", caseval[i], reglist[reg]);
+        fprintf(Outfile, "\tje\tL%d\n", caselabel[i]);
     }
-
-    fprintf(Outfile, "\t.quad\tL%d\n", defaultlabel);
-
-    // Load the specific registers
-    cglabel(toplabel);
-    fprintf(Outfile, "\tmovq\t%s, %%rax\n", reglist[reg]);
-    fprintf(Outfile, "\tleaq\tL%d(%%rip), %%rdx\n", label);
-    fprintf(Outfile, "\tjmp\tswitch\n");
+    fprintf(Outfile, "\tjmp\tL%d\n", defaultlabel);
 }
