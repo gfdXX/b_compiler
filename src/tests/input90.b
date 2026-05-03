@@ -8,12 +8,12 @@ main() {
     v[3] = 6;
 
     p = &v[1];
-    printf("%d\n", *p);
+    printf("%d*n", *p);
 
     *p = 20;
-    printf("%d\n", v[1]);
-    printf("%d\n", 2[v]);
-    printf("%d\n", *(v + 3));
+    printf("%d*n", v[1]);
+    printf("%d*n", 2[v]);
+    printf("%d*n", *(v + 3));
 
     return 0;
 }

@@ -88,8 +88,8 @@ static int scanch(void)
 {
     int c;
 
-    // Get the next input character and interpret
-    // metacharacters that start with a backslash
+    // Get the next input character and interpret B escapes.
+    // B uses '*' as the escape character inside character and string constants.
     c = next();
 
     if (c == '*')
@@ -119,34 +119,6 @@ static int scanch(void)
         }
     }
 
-    if (c == '\\')
-    {
-        switch (c = next())
-        {
-            case 'a':
-                return '\a';
-            case 'b':
-                return '\b';
-            case 'f':
-                return '\f';
-            case 'n':
-                return '\n';
-            case 'r':
-                return '\r';
-            case 't':
-                return '\t';
-            case 'v':
-                return '\v';
-            case '\\':
-                return '\\';
-            case '"':
-                return '"';
-            case '\'':
-                return '\'';
-            default:
-                fatalc("unknown escape sequence", c);
-        }
-    }
     return (c);			// Just an ordinary old character!
 }
 

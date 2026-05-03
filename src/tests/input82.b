@@ -56,7 +56,7 @@ print_bubble(n) {
 
     i = 0;
     while (i < n) {
-        printf("%d\n", bubble[i]);
+        printf("%d*n", bubble[i]);
         i = i + 1;
     }
 
@@ -69,7 +69,7 @@ print_insert(n) {
 
     i = 0;
     while (i < n) {
-        printf("%d\n", insert[i]);
+        printf("%d*n", insert[i]);
         i = i + 1;
     }
 

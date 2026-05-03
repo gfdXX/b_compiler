@@ -58,7 +58,7 @@ bfs(start, n) {
     while (head < tail) {
         node = queue[head];
         head = head + 1;
-        printf("%d\n", node);
+        printf("%d*n", node);
 
         i = 0;
         while (i < n) {

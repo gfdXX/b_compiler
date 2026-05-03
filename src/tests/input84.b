@@ -47,7 +47,7 @@ dfs_visit(node, n) {
     extrn printf;
 
     visited[node] = 1;
-    printf("%d\n", node);
+    printf("%d*n", node);
 
     i = 0;
     while (i < n) {

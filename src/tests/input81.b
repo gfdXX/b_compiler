@@ -25,7 +25,7 @@ fibdyn(n) {
 main() {
     extrn printf;
 
-    printf("%d\n", fib(10));
-    printf("%d\n", fibdyn(10));
+    printf("%d*n", fib(10));
+    printf("%d*n", fibdyn(10));
     return(0);
 }

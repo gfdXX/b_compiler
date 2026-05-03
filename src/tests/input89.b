@@ -7,12 +7,12 @@ main() {
 
     p = &glob;
 
-    printf("%d\n", glob);
-    printf("%d\n", p[1]);
-    printf("%d\n", vec[2]);
-    printf("%d\n", vec[3]);
-    printf("%d\n", '*n');
-    printf("%d\n", 'AZ');
+    printf("%d*n", glob);
+    printf("%d*n", p[1]);
+    printf("%d*n", vec[2]);
+    printf("%d*n", vec[3]);
+    printf("%d*n", '*n');
+    printf("%d*n", 'AZ');
 
     return 0;
 }

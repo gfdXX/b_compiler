@@ -26,7 +26,7 @@ print_list(start) {
 
     node = start;
     while (node != -1) {
-        printf("%d\n", values[node]);
+        printf("%d*n", values[node]);
         node = links[node];
     }
 
