@@ -1,0 +1,68 @@
+\begin{appendices}
+\chapter{Грамматика поддерживаемого языка B}
+
+Ниже приведена укрупненная грамматика поддерживаемого ядра языка B. Запись не повторяет дословно историческую нотацию руководства, а адаптирует ее к реализации компилятора.
+
+Листинг А.1 --- Укрупненная грамматика внешних определений.
+\begin{verbatim}
+program     ::= { definition }
+
+definition  ::= name [ "[" [ constant ] "]" ] [ initializer-list ] ";"
+              | name "(" [ parameter-list ] ")" compound-statement
+
+initializer-list ::= initializer { "," initializer }
+initializer      ::= constant | name
+parameter-list   ::= parameter { "," parameter }
+parameter        ::= name
+\end{verbatim}
+
+Листинг А.2 --- Грамматика операторов.
+\begin{verbatim}
+statement ::= "auto" auto-list ";"
+            | "extrn" name-list ";"
+            | name ":" statement
+            | "case" constant ":" statement
+            | "{" { statement } "}"
+            | "if" "(" expression ")" statement [ "else" statement ]
+            | "while" "(" expression ")" statement
+            | "switch" expression statement
+            | "goto" expression ";"
+            | "return" [ "(" expression ")" | expression ] ";"
+            | [ expression ] ";"
+
+auto-list ::= auto-decl { "," auto-decl }
+auto-decl ::= name [ constant | "[" [ constant ] "]" ]
+name-list ::= name { "," name }
+\end{verbatim}
+
+Листинг А.3 --- Грамматика выражений.
+\begin{verbatim}
+expression ::= assignment
+assignment ::= conditional [ assign-op assignment ]
+conditional ::= binary-expression
+              | binary-expression "?" expression ":" conditional
+
+primary    ::= name
+             | constant
+             | string
+             | "(" expression ")"
+
+postfix    ::= primary { "(" [ argument-list ] ")"
+                       | "[" expression "]"
+                       | "++"
+                       | "--" }
+
+prefix     ::= postfix
+             | "&" prefix
+             | "*" prefix
+             | "-" prefix
+             | "!" prefix
+             | "~" prefix
+             | "++" prefix
+             | "--" prefix
+
+binary-expression ::= prefix { binary-op prefix }
+\end{verbatim}
+
+При синтаксическом анализе выражений используется таблица приоритетов операторов. Присваивание является правоассоциативным. Тернарный оператор также связывается справа налево. Остальные бинарные операторы обрабатываются с учетом их приоритета и левой ассоциативности.
+\end{appendices}
