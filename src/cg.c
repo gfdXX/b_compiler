@@ -131,9 +131,6 @@ void cgpreamble()
     freeall_registers();
     cgtextseg();
     fprintf(Outfile,
-        "# internal switch(expr) routine\n"
-        "# %%rsi = switch table, %%rax = expr\n"
-        "# from SubC: http://www.t3x.org/subc/\n"
         "\n"
         "switch:\n"
         "        pushq   %%rsi\n"
